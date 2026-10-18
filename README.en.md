@@ -42,6 +42,12 @@ A normal ChatGPT tab in a browser is not enough for the local-browser integratio
 
 Browser authentication is profile-specific. A website session in Edge does not automatically exist in Chrome.
 
+### If Microsoft Store cannot install the desktop app
+
+See [How to install Codex when Microsoft Store will not download the app (in Russian)](https://n-fm.ru/ustanovka-codex-microsoft-store/). The article covers checking the Windows home region, a possible installation route through `winget`, and a separate `helper_failed` troubleshooting case. It also includes a ready-to-copy AI prompt for step-by-step diagnosis.
+
+This installs the **desktop app**; it is separate from obtaining a browser-extension ZIP. In the installation described in that article, the app was installed from the console after changing the Windows region to Kazakhstan; no separate ZIP was downloaded for that installation. This may help with some Microsoft Store failures, but is not a universal fix. Changing the Windows region does not by itself change OpenAI service availability.
+
 ---
 
 ## 2. Connect Chrome or Edge
@@ -294,7 +300,7 @@ Work carefully and diagnose before changing anything.
 
 If the failure appeared after a VPN, proxy, network, or IP/route change, determine the current local HTTP proxy used by Windows and the VPN/proxy client. Do not confuse the local proxy endpoint with the external/public IP. Verify both the local port and a real external request through the proxy. Compare that with the configuration used by the actually active Codex browser runtime.
 
-Only if diagnostics confirm that the active browser runtime is still using an outdated proxy and the current Codex version is compatible with the workaround, back up the active cua-repl.mjs file before editing it. A path like %LOCALAPPDATA%\OpenAI\Codex\runtimes\cua_node\<version>\bin\node_modules\@oai\cua-repl\bin\cua-repl.mjs is only an example; determine the runtime that is actually active. chrome-native-hosts-v2.json may contain stale entries.
+Only if diagnostics confirm that the active browser runtime is using an outdated proxy or is missing the required proxy configuration (for example, after an update), and the current Codex version is compatible with the workaround, back up the active cua-repl.mjs file before editing it. A path like %LOCALAPPDATA%\OpenAI\Codex\runtimes\cua_node\<version>\bin\node_modules\@oai\cua-repl\bin\cua-repl.mjs is only an example; determine the runtime that is actually active. chrome-native-hosts-v2.json may contain stale entries.
 
 In a compatible version, before await cua_repl.launch(); the workaround sets HTTP_PROXY and HTTPS_PROXY to the verified current local HTTP proxy, NO_PROXY to localhost,127.0.0.1,::1, and NODE_USE_ENV_PROXY=1, while preserving all existing NODE_REPL_UNTRUSTED_ENV_ALLOWLIST values and adding HTTP_PROXY, HTTPS_PROXY, NO_PROXY and NODE_USE_ENV_PROXY if missing.
 
@@ -322,7 +328,7 @@ Do not reinstall everything first. Diagnose the current browser connection and n
 4. Determine the current local HTTP proxy used by Windows and the VPN/proxy client. Do not confuse it with the external/public IP.
 5. Verify that the local proxy port is reachable and that a real external request succeeds through it.
 6. Identify the actually active Codex cua_node runtime and compare its proxy/runtime configuration with the current working network configuration. Do not blindly use the first runtime folder you find; chrome-native-hosts-v2.json may contain stale entries.
-7. Only if diagnostics confirm an outdated-proxy mismatch and this Codex version is compatible with the workaround, back up the active cua-repl.mjs file. Before await cua_repl.launch(); add or update the following block, replacing CURRENT_HTTP_PROXY with the verified current local HTTP proxy:
+7. Only if diagnostics confirm an outdated-proxy mismatch or missing required proxy configuration (for example, after an update), and this Codex version is compatible with the workaround, back up the active cua-repl.mjs file. Before await cua_repl.launch(); add or update the following block, replacing CURRENT_HTTP_PROXY with the verified current local HTTP proxy:
 
 process.env.HTTP_PROXY = 'CURRENT_HTTP_PROXY';
 process.env.HTTPS_PROXY = 'CURRENT_HTTP_PROXY';
